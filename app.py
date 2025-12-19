@@ -1,30 +1,48 @@
-from flask import Flask, jsonify
-from storygraph_api import User, Book
+from flask import Flask, jsonify, render_template
 from dotenv import load_dotenv
+from pymongo import MongoClient
+import os
+import random
 load_dotenv()
 
 app = Flask(__name__)
 
+# MongoDB connection
+mongodb_uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017/")
+db_name = os.getenv("MONGODB_DB", "book_recommendations")
+collection_name = os.getenv("MONGODB_COLLECTION", "books")
+client = MongoClient(mongodb_uri, tlsAllowInvalidCertificates=True)
+db = client[db_name]
+collection = db[collection_name]
 
-@app.route('/get-recomendation', methods=['GET'])
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/api/get-recomendation', methods=['GET'])
 def get_recomendation():
-    cookie = os.getenv("COOKIE")
-    uname= os.getenv("UNAME")
-
-    user = User();
-    to_read = user.to_read(uname, cookie)
-
-    books_to_read = to_read.length
-    random_book = random.choice(books_to_read)
-
-    book = Book();
-    book_info = book.book_info(random_book.book_id)
-    
-    book_image_url = book_info.book_cover
-    
-    return jsonify({
-        "url": book_image_url
-    })
+    try:
+        # Get a random document from the collection using aggregation
+        pipeline = [{"$sample": {"size": 1}}]
+        random_books = list(collection.aggregate(pipeline))
+        
+        if not random_books:
+            return jsonify({"error": f"Collection '{collection_name}' is empty"}), 500
+        
+        random_book = random_books[0]
+        
+        # Extract title and cover
+        title = random_book.get("title", "Unknown Title")
+        cover = random_book.get("cover", "")
+        
+        return jsonify({
+            "title": title,
+            "cover": cover
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

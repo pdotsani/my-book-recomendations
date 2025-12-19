@@ -23,13 +23,12 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Virtual Environments
+# Virtual Environment
 venv/
 env/
 ENV/
 env.bak/
 venv.bak/
-.venv/
 
 # Environment variables
 .env
@@ -65,4 +64,7 @@ htmlcov/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Pyre type checker
+.pyre/
 

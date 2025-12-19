@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single:wght@100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <title>Book Recommendation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 80px;
+            font-family: "Libre Baskerville", serif;
+            font-style: normal;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #2f2f2f;
+            color: #ffffff;
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .book-container {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .book-cover {
+            max-width: 48rem;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .book-title {
+            margin-top: 1.5rem;
+            color: #ffffff;
+            font-weight: 600;
+            text-align: center;
+        }
+        .loading {
+            color: #ffffff;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .error {
+            color: #d32f2f;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #2f2f2f;
+            box-sizing: border-box;
+        }
+        .footer a,
+        .footer button {
+            color: #ffffff;
+            text-decoration: none;
+            background: none;
+            border: none;
+            font-family: "Libre Baskerville", serif;
+            font-size: inherit;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+        .footer a:hover,
+        .footer button:hover {
+            text-decoration: underline;
+        }
+        .footer button {
+            margin-bottom: 10px;
+            display: block;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" class="loading">Loading book...</div>
+        <div id="bookContainer" class="book-container">
+            <img id="bookCover" class="book-cover" style="display: none;" alt="Book Cover">
+            <h3 id="bookTitle" class="book-title" style="display: none;"></h3>
+        </div>
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        async function loadBookCover() {
+            try {
+                // Hide error and show loading
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('bookContainer').style.display = 'none';
+                
+                const response = await fetch('/api/get-recomendation');
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (data.cover && data.title) {
+                    const container = document.getElementById('bookContainer');
+                    const img = document.getElementById('bookCover');
+                    const title = document.getElementById('bookTitle');
+                    
+                    img.src = data.cover;
+                    img.style.display = 'block';
+                    // Replace newlines with <br> tags
+                    title.innerHTML = data.title.replace(/\n/g, '<br>');
+                    title.style.display = 'block';
+                    document.getElementById('loading').style.display = 'none';
+                    container.style.display = 'flex';
+                } else {
+                    throw new Error('Missing cover or title in response');
+                }
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').textContent = 'Failed to load book: ' + error.message;
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        loadBookCover();
+    </script>
+    <footer class="footer">
+        <button onclick="loadBookCover()">anotha one!</button>
+        <a href="https://patricksanjuan.com">back home</a>
+    </footer>
+</body>
+</html>
+
