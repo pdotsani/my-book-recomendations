@@ -2,6 +2,10 @@
 
 A Flask API that provides random book recommendations from a MongoDB database.
 
+## Description
+
+Scraping from a reading tracker app, we collect the data and save it in a mongodb. The data we save is what you see when you load a recommendation.
+
 ## Prerequisites
 
 - Python 3.7 or higher
