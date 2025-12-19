@@ -1,11 +1,12 @@
 # Book Recommendations API
 
-A Flask API that provides book recommendations from your StoryGraph reading list.
+A Flask API that provides random book recommendations from a MongoDB database.
 
 ## Prerequisites
 
 - Python 3.7 or higher
 - pip (Python package manager)
+- MongoDB (local installation or MongoDB Atlas account)
 
 ## Local Setup
 
@@ -40,17 +41,27 @@ Copy the example environment file:
 cp .env.example .env
 ```
 
-Edit `.env` and add your credentials:
+Edit `.env` and add your MongoDB credentials:
+
+**For local MongoDB:**
 ```
-COOKIE=your_cookie_here
-UNAME=your_username_here
+MONGODB_URI=mongodb://localhost:27017/
+MONGODB_DB=book_recommendations
 ```
+
+**For MongoDB Atlas (cloud):**
+```
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/
+MONGODB_DB=book_recommendations
+```
+
+**Note:** Your MongoDB collections should contain documents with `title` (string) and `cover` (URL string) fields.
 
 ## Running the Application
 
 Start the Flask development server:
 ```bash
-python app.py
+flask run
 ```
 
 The API will be available at `http://localhost:5000`
